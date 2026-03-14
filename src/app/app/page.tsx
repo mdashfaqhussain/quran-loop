@@ -9,8 +9,9 @@ import Settings from "@/components/Settings";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserData, type MemorizedItem } from "@/hooks/useUserData";
 import { DEFAULT_SETTINGS } from "@/lib/userData";
+import AuthWrapper from "@/components/AuthWrapper";
 
-export default function AppPage() {
+function AppContent() {
   const { user } = useAuth();
   const {
     memorized: cloudMemorized,
@@ -35,25 +36,34 @@ export default function AppPage() {
   const setMemorizedData = useCallback(
     (value: MemorizedItem[] | ((prev: MemorizedItem[]) => MemorizedItem[])) => {
       if (isSignedIn) {
-        const next = typeof value === "function" ? value(cloudMemorized) : value;
+        const next =
+          typeof value === "function" ? value(cloudMemorized) : value;
         setCloudMemorized(next);
       } else {
-        setLocalMemorized(typeof value === "function" ? value(localMemorized) : value);
+        setLocalMemorized(
+          typeof value === "function" ? value(localMemorized) : value,
+        );
       }
     },
-    [isSignedIn, cloudMemorized, localMemorized, setCloudMemorized]
+    [isSignedIn, cloudMemorized, localMemorized, setCloudMemorized],
   );
 
   const setSettings = useCallback(
-    (value: typeof DEFAULT_SETTINGS | ((prev: typeof DEFAULT_SETTINGS) => typeof DEFAULT_SETTINGS)) => {
+    (
+      value:
+        | typeof DEFAULT_SETTINGS
+        | ((prev: typeof DEFAULT_SETTINGS) => typeof DEFAULT_SETTINGS),
+    ) => {
       if (isSignedIn) {
         const next = typeof value === "function" ? value(cloudSettings) : value;
         setCloudSettings(next);
       } else {
-        setLocalSettings(typeof value === "function" ? value(localSettings) : value);
+        setLocalSettings(
+          typeof value === "function" ? value(localSettings) : value,
+        );
       }
     },
-    [isSignedIn, cloudSettings, localSettings, setCloudSettings]
+    [isSignedIn, cloudSettings, localSettings, setCloudSettings],
   );
 
   const dynamicStats = useMemo(
@@ -63,14 +73,14 @@ export default function AppPage() {
       weeklyGoal: 7,
       monthlyGoal: 30,
     }),
-    [memorizedData]
+    [memorizedData],
   );
 
   function calculateCurrentStreak(data: MemorizedItem[]): number {
     if (data.length === 0) return 0;
     const today = new Date();
     const dates = Array.from(
-      new Set(data.map((item) => item.memorizedAt.toDateString()))
+      new Set(data.map((item) => item.memorizedAt.toDateString())),
     );
     dates.sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
     let streak = 0;
@@ -79,7 +89,7 @@ export default function AppPage() {
       const memorizedDate = new Date(dates[i]);
       const daysDiff = Math.floor(
         (currentDate.getTime() - memorizedDate.getTime()) /
-          (1000 * 60 * 60 * 24)
+          (1000 * 60 * 60 * 24),
       );
       if (daysDiff === streak) {
         streak++;
@@ -93,7 +103,7 @@ export default function AppPage() {
   function calculateLongestStreak(data: MemorizedItem[]): number {
     if (data.length === 0) return 0;
     const dates = Array.from(
-      new Set(data.map((item) => item.memorizedAt.toDateString()))
+      new Set(data.map((item) => item.memorizedAt.toDateString())),
     );
     dates.sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
     let longestStreak = 0;
@@ -103,7 +113,7 @@ export default function AppPage() {
       const date = new Date(dateStr);
       if (lastDate) {
         const daysDiff = Math.floor(
-          (date.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24)
+          (date.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24),
         );
         if (daysDiff === 1) {
           currentStreak++;
@@ -123,7 +133,7 @@ export default function AppPage() {
     (surahName: string, ayatNum: number, surahNum: number) => {
       setMemorizedData((prev) => {
         const existing = prev.find(
-          (item) => item.surahNum === surahNum && item.ayatNum === ayatNum
+          (item) => item.surahNum === surahNum && item.ayatNum === ayatNum,
         );
         if (existing) {
           return prev.map((item) =>
@@ -134,7 +144,7 @@ export default function AppPage() {
                   memorizedAt: new Date(),
                   lastReviewed: new Date(),
                 }
-              : item
+              : item,
           );
         }
         return [
@@ -151,7 +161,7 @@ export default function AppPage() {
         ];
       });
     },
-    [setMemorizedData]
+    [setMemorizedData],
   );
 
   const handleSurahSelect = (surahNum: number, surahName: string) => {
@@ -162,7 +172,7 @@ export default function AppPage() {
   const handleReviewAyat = (
     surahNum: number,
     ayatNum: number,
-    surahName: string
+    surahName: string,
   ) => {
     setSelectedSurah({ number: surahNum, name: surahName });
     setActiveSection("player");
@@ -174,18 +184,18 @@ export default function AppPage() {
         surahNum: item.surahNum,
         ayatNum: item.ayatNum,
       })),
-    [memorizedData]
+    [memorizedData],
   );
 
   const handleUnmarkMemorized = useCallback(
     (surahName: string, ayatNum: number, surahNum: number) => {
       setMemorizedData((prev) =>
         prev.filter(
-          (item) => !(item.surahNum === surahNum && item.ayatNum === ayatNum)
-        )
+          (item) => !(item.surahNum === surahNum && item.ayatNum === ayatNum),
+        ),
       );
     },
-    [setMemorizedData]
+    [setMemorizedData],
   );
 
   const renderContent = () => {
@@ -217,12 +227,7 @@ export default function AppPage() {
           />
         );
       case "settings":
-        return (
-          <Settings
-            settings={settings}
-            onSettingsChange={setSettings}
-          />
-        );
+        return <Settings settings={settings} onSettingsChange={setSettings} />;
       default:
         return <ModernQuranPlayer />;
     }
@@ -237,5 +242,13 @@ export default function AppPage() {
     >
       {renderContent()}
     </ModernAppLayout>
+  );
+}
+
+export default function AppPage() {
+  return (
+    <AuthWrapper>
+      <AppContent />
+    </AuthWrapper>
   );
 }
