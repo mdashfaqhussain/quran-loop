@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import AppLayout from "@/components/AppLayout";
-import QuranLoopPlayer from "@/components/QuranLoopPlayer";
+import ModernAppLayout from "@/components/ModernAppLayout";
+import ModernQuranPlayer from "@/components/ModernQuranPlayer";
 import EnhancedProgressDashboard from "@/components/EnhancedProgressDashboard";
 import EnhancedSurahLibrary from "@/components/EnhancedSurahLibrary";
 import Settings from "@/components/Settings";
@@ -190,7 +190,7 @@ export default function Home() {
     switch (activeSection) {
       case "player":
         return (
-          <QuranLoopPlayer
+          <ModernQuranPlayer
             onMarkMemorized={handleMarkMemorized}
             selectedSurahFromLibrary={selectedSurah}
           />
@@ -214,13 +214,16 @@ export default function Home() {
       case "settings":
         return <Settings settings={settings} onSettingsChange={setSettings} />;
       default:
-        return <QuranLoopPlayer />;
+        return <ModernQuranPlayer />;
     }
   };
 
   return (
-    <AppLayout activeSection={activeSection} onSectionChange={setActiveSection}>
+    <ModernAppLayout
+      activeSection={activeSection}
+      onSectionChange={setActiveSection}
+    >
       {renderContent()}
-    </AppLayout>
+    </ModernAppLayout>
   );
 }
