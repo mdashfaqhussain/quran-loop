@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Volume2, Clock, Languages, Moon, Sun } from "lucide-react";
+import { Volume2, Clock, Languages, Moon, Sun, User } from "lucide-react";
+import AuthUI from "./AuthUI";
 
 interface SettingsProps {
   settings: {
@@ -16,7 +17,7 @@ interface SettingsProps {
 }
 
 export default function Settings({ settings, onSettingsChange }: SettingsProps) {
-  const [activeTab, setActiveTab] = useState<'general' | 'audio' | 'display'>('general');
+  const [activeTab, setActiveTab] = useState<'general' | 'audio' | 'display' | 'account'>('general');
 
   const updateSetting = (key: string, value: any) => {
     onSettingsChange({ ...settings, [key]: value });
@@ -26,11 +27,12 @@ export default function Settings({ settings, onSettingsChange }: SettingsProps) 
     <div className="space-y-6">
       {/* Settings Tabs */}
       <div className="bg-white border border-parchment-200 rounded-xl p-4 shadow-sm">
-        <div className="flex gap-2 mb-6">
+        <div className="flex flex-wrap gap-2 mb-6">
           {[
             { key: 'general', label: 'General' },
             { key: 'audio', label: 'Audio' },
-            { key: 'display', label: 'Display' }
+            { key: 'display', label: 'Display' },
+            { key: 'account', label: 'Account' }
           ].map(tab => (
             <button
               key={tab.key}
@@ -182,6 +184,20 @@ export default function Settings({ settings, onSettingsChange }: SettingsProps) 
                 </button>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Account - Sign in / Sync */}
+        {activeTab === 'account' && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 mb-4">
+              <User className="w-5 h-5 text-primary-600" />
+              <p className="font-medium text-neutral-800">Account & sync</p>
+            </div>
+            <p className="text-sm text-neutral-600">
+              Sign in to sync your memorized verses and settings across devices.
+            </p>
+            <AuthUI />
           </div>
         )}
       </div>

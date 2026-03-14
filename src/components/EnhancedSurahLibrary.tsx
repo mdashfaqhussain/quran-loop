@@ -2,47 +2,68 @@
 
 import { useState, useMemo } from "react";
 import { SURAHS } from "@/lib/surahs";
-import { Search, BookOpen, CheckCircle, Filter, Grid, List, Star, Clock, TrendingUp } from "lucide-react";
+import {
+  Search,
+  BookOpen,
+  CheckCircle,
+  Filter,
+  Grid,
+  List,
+  Star,
+  Clock,
+  TrendingUp,
+} from "lucide-react";
 
 interface EnhancedSurahLibraryProps {
   onSurahSelect: (surahNum: number, surahName: string) => void;
   memorizedAyats?: Array<{ surahNum: number; ayatNum: number }>;
 }
 
-export default function EnhancedSurahLibrary({ onSurahSelect, memorizedAyats = [] }: EnhancedSurahLibraryProps) {
+export default function EnhancedSurahLibrary({
+  onSurahSelect,
+  memorizedAyats = [],
+}: EnhancedSurahLibraryProps) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [sortBy, setSortBy] = useState<'number' | 'name' | 'ayats'>('number');
-  const [filterBy, setFilterBy] = useState<'all' | 'memorized' | 'unmemorized'>('all');
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [sortBy, setSortBy] = useState<"number" | "name" | "ayats">("number");
+  const [filterBy, setFilterBy] = useState<"all" | "memorized" | "unmemorized">(
+    "all",
+  );
 
   // Calculate memorization stats for each surah
   const surahStats = useMemo(() => {
-    return SURAHS.map(surah => {
-      const memorizedInSurah = memorizedAyats.filter(item => item.surahNum === surah.number);
+    return SURAHS.map((surah) => {
+      const memorizedInSurah = memorizedAyats.filter(
+        (item) => item.surahNum === surah.number,
+      );
       const memorizedCount = memorizedInSurah.length;
-      const completionRate = Math.round((memorizedCount / surah.ayatCount) * 100);
-      
+      const completionRate = Math.round(
+        (memorizedCount / surah.ayatCount) * 100,
+      );
+
       return {
         ...surah,
         memorizedCount,
         completionRate,
         isStarted: memorizedCount > 0,
-        isCompleted: memorizedCount === surah.ayatCount
+        isCompleted: memorizedCount === surah.ayatCount,
       };
     });
   }, [memorizedAyats]);
 
   // Filter and sort surahs
   const filteredAndSortedSurahs = useMemo(() => {
-    let filtered = surahStats.filter(surah => {
-      const matchesSearch = searchTerm === "" || 
+    let filtered = surahStats.filter((surah) => {
+      const matchesSearch =
+        searchTerm === "" ||
         surah.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         surah.arabicName.includes(searchTerm) ||
         surah.number.toString().includes(searchTerm);
 
-      const matchesFilter = filterBy === 'all' ||
-        (filterBy === 'memorized' && surah.isStarted) ||
-        (filterBy === 'unmemorized' && !surah.isStarted);
+      const matchesFilter =
+        filterBy === "all" ||
+        (filterBy === "memorized" && surah.isStarted) ||
+        (filterBy === "unmemorized" && !surah.isStarted);
 
       return matchesSearch && matchesFilter;
     });
@@ -50,11 +71,11 @@ export default function EnhancedSurahLibrary({ onSurahSelect, memorizedAyats = [
     // Sort surahs
     return filtered.sort((a, b) => {
       switch (sortBy) {
-        case 'number':
+        case "number":
           return a.number - b.number;
-        case 'name':
+        case "name":
           return a.name.localeCompare(b.name);
-        case 'ayats':
+        case "ayats":
           return b.ayatCount - a.ayatCount;
         default:
           return 0;
@@ -64,21 +85,21 @@ export default function EnhancedSurahLibrary({ onSurahSelect, memorizedAyats = [
 
   const stats = useMemo(() => {
     const totalSurahs = SURAHS.length;
-    const startedSurahs = surahStats.filter(s => s.isStarted).length;
-    const completedSurahs = surahStats.filter(s => s.isCompleted).length;
+    const startedSurahs = surahStats.filter((s) => s.isStarted).length;
+    const completedSurahs = surahStats.filter((s) => s.isCompleted).length;
     const totalMemorizedAyats = memorizedAyats.length;
-    
+
     return {
       totalSurahs,
       startedSurahs,
       completedSurahs,
       totalMemorizedAyats,
-      overallProgress: Math.round((startedSurahs / totalSurahs) * 100)
+      overallProgress: Math.round((startedSurahs / totalSurahs) * 100),
     };
   }, [surahStats, memorizedAyats]);
 
   return (
-    <div className="space-y-6">
+    <div className="h-full flex flex-col space-y-6">
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="glass-card rounded-xl p-6 hover-lift">
@@ -87,7 +108,9 @@ export default function EnhancedSurahLibrary({ onSurahSelect, memorizedAyats = [
               <BookOpen className="w-6 h-6 text-white" />
             </div>
             <div>
-              <p className="text-3xl font-bold text-ink-DEFAULT">{stats.totalSurahs}</p>
+              <p className="text-3xl font-bold text-ink-DEFAULT">
+                {stats.totalSurahs}
+              </p>
               <p className="text-sm text-ink-fant">Total Surahs</p>
             </div>
           </div>
@@ -99,7 +122,9 @@ export default function EnhancedSurahLibrary({ onSurahSelect, memorizedAyats = [
               <TrendingUp className="w-6 h-6 text-white" />
             </div>
             <div>
-              <p className="text-3xl font-bold text-ink-DEFAULT">{stats.startedSurahs}</p>
+              <p className="text-3xl font-bold text-ink-DEFAULT">
+                {stats.startedSurahs}
+              </p>
               <p className="text-sm text-ink-fant">Started</p>
             </div>
           </div>
@@ -111,7 +136,9 @@ export default function EnhancedSurahLibrary({ onSurahSelect, memorizedAyats = [
               <CheckCircle className="w-6 h-6 text-white" />
             </div>
             <div>
-              <p className="text-3xl font-bold text-ink-DEFAULT">{stats.completedSurahs}</p>
+              <p className="text-3xl font-bold text-ink-DEFAULT">
+                {stats.completedSurahs}
+              </p>
               <p className="text-sm text-ink-fant">Completed</p>
             </div>
           </div>
@@ -123,7 +150,9 @@ export default function EnhancedSurahLibrary({ onSurahSelect, memorizedAyats = [
               <Star className="w-6 h-6 text-white" />
             </div>
             <div>
-              <p className="text-3xl font-bold text-ink-DEFAULT">{stats.totalMemorizedAyats}</p>
+              <p className="text-3xl font-bold text-ink-DEFAULT">
+                {stats.totalMemorizedAyats}
+              </p>
               <p className="text-sm text-ink-fant">Total Ayats</p>
             </div>
           </div>
@@ -148,18 +177,27 @@ export default function EnhancedSurahLibrary({ onSurahSelect, memorizedAyats = [
           {/* Filter */}
           <div className="flex gap-2">
             {[
-              { key: 'all', label: 'All', count: stats.totalSurahs },
-              { key: 'memorized', label: 'Started', count: stats.startedSurahs },
-              { key: 'unmemorized', label: 'Not Started', count: stats.totalSurahs - stats.startedSurahs }
-            ].map(filter => (
+              { key: "all", label: "All", count: stats.totalSurahs },
+              {
+                key: "memorized",
+                label: "Started",
+                count: stats.startedSurahs,
+              },
+              {
+                key: "unmemorized",
+                label: "Not Started",
+                count: stats.totalSurahs - stats.startedSurahs,
+              },
+            ].map((filter) => (
               <button
                 key={filter.key}
                 onClick={() => setFilterBy(filter.key as any)}
                 className={`
                   px-4 py-3 rounded-xl text-sm font-medium transition-all hover-lift
-                  ${filterBy === filter.key
-                    ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg'
-                    : 'bg-parchment-100 text-ink-muted hover:bg-parchment-200'
+                  ${
+                    filterBy === filter.key
+                      ? "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg"
+                      : "bg-parchment-100 text-ink-muted hover:bg-parchment-200"
                   }
                 `}
               >
@@ -185,21 +223,21 @@ export default function EnhancedSurahLibrary({ onSurahSelect, memorizedAyats = [
 
             <div className="flex gap-1 bg-parchment-100 rounded-xl p-1">
               <button
-                onClick={() => setViewMode('grid')}
+                onClick={() => setViewMode("grid")}
                 className={`p-2 rounded-lg transition-all ${
-                  viewMode === 'grid' 
-                    ? 'bg-white text-emerald-600 shadow-sm' 
-                    : 'text-ink-muted hover:text-ink-DEFAULT'
+                  viewMode === "grid"
+                    ? "bg-white text-emerald-600 shadow-sm"
+                    : "text-ink-muted hover:text-ink-DEFAULT"
                 }`}
               >
                 <Grid className="w-4 h-4" />
               </button>
               <button
-                onClick={() => setViewMode('list')}
+                onClick={() => setViewMode("list")}
                 className={`p-2 rounded-lg transition-all ${
-                  viewMode === 'list' 
-                    ? 'bg-white text-emerald-600 shadow-sm' 
-                    : 'text-ink-muted hover:text-ink-DEFAULT'
+                  viewMode === "list"
+                    ? "bg-white text-emerald-600 shadow-sm"
+                    : "text-ink-muted hover:text-ink-DEFAULT"
                 }`}
               >
                 <List className="w-4 h-4" />
@@ -219,147 +257,163 @@ export default function EnhancedSurahLibrary({ onSurahSelect, memorizedAyats = [
         </div>
 
         {/* Surah Display */}
-        {viewMode === 'grid' ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 max-h-96 overflow-y-auto pr-2">
-            {filteredAndSortedSurahs.map((surah, index) => (
-              <div
-                key={surah.number}
-                onClick={() => onSurahSelect(surah.number, surah.name)}
-                className="group p-4 bg-white rounded-xl border border-parchment-200 hover:border-emerald-DEFAULT hover:bg-parchment-50 transition-all cursor-pointer hover-lift"
-                style={{ animationDelay: `${index * 30}ms` }}
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg font-bold text-emerald-DEFAULT">
-                      {surah.number}.
-                    </span>
-                    <div>
-                      <p className="font-semibold text-ink-DEFAULT group-hover:text-emerald-DEFAULT">
-                        {surah.name}
-                      </p>
-                      <p className="text-sm font-arabic text-ink-muted">
-                        {surah.arabicName}
-                      </p>
-                    </div>
-                  </div>
-                  <BookOpen className="w-4 h-4 text-ink-fant group-hover:text-emerald-DEFAULT" />
-                </div>
-
-                <div className="flex items-center justify-between text-xs text-ink-fant mb-3">
-                  <span>{surah.ayatCount} ayats</span>
-                  <span>{surah.hasBismillah ? 'With Bismillah' : 'No Bismillah'}</span>
-                </div>
-
-                {/* Progress Bar */}
-                {surah.isStarted && (
-                  <div className="mb-3">
-                    <div className="flex items-center justify-between text-xs text-ink-muted mb-1">
-                      <span>{surah.memorizedCount}/{surah.ayatCount} memorized</span>
-                      <span>{surah.completionRate}%</span>
-                    </div>
-                    <div className="bg-parchment-200 rounded-full h-2">
-                      <div 
-                        className={`h-2 rounded-full transition-all duration-500 ${
-                          surah.isCompleted 
-                            ? 'bg-gradient-to-r from-purple-400 to-purple-600' 
-                            : 'bg-gradient-to-r from-emerald-400 to-emerald-600'
-                        }`}
-                        style={{ width: `${surah.completionRate}%` }}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                <div className="pt-3 border-t border-parchment-200">
-                  <div className="flex items-center justify-between">
+        <div className="flex-1 min-h-0">
+          {viewMode === "grid" ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 h-full overflow-y-auto pr-2">
+              {filteredAndSortedSurahs.map((surah, index) => (
+                <div
+                  key={surah.number}
+                  onClick={() => onSurahSelect(surah.number, surah.name)}
+                  className="group p-4 bg-white rounded-xl border border-parchment-200 hover:border-emerald-DEFAULT hover:bg-parchment-50 transition-all cursor-pointer hover-lift"
+                  style={{ animationDelay: `${index * 30}ms` }}
+                >
+                  <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      {surah.isCompleted ? (
-                        <>
-                          <CheckCircle className="w-4 h-4 text-purple-DEFAULT" />
-                          <span className="text-xs text-purple-DEFAULT font-medium">Completed</span>
-                        </>
-                      ) : surah.isStarted ? (
-                        <>
-                          <Clock className="w-4 h-4 text-emerald-DEFAULT" />
-                          <span className="text-xs text-emerald-DEFAULT font-medium">In Progress</span>
-                        </>
-                      ) : (
-                        <>
-                          <CheckCircle className="w-4 h-4 text-ink-fant" />
-                          <span className="text-xs text-ink-fant">Not Started</span>
-                        </>
-                      )}
-                    </div>
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onSurahSelect(surah.number, surah.name);
-                      }}
-                      className="text-xs px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg font-medium hover:from-emerald-600 hover:to-emerald-700 transition-all"
-                    >
-                      {surah.isStarted ? 'Continue' : 'Start'}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="space-y-2 max-h-96 overflow-y-auto pr-2">
-            {filteredAndSortedSurahs.map((surah, index) => (
-              <div
-                key={surah.number}
-                onClick={() => onSurahSelect(surah.number, surah.name)}
-                className="group p-4 bg-white rounded-xl border border-parchment-200 hover:border-emerald-DEFAULT hover:bg-parchment-50 transition-all cursor-pointer hover-lift"
-                style={{ animationDelay: `${index * 30}ms` }}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <span className="text-lg font-bold text-emerald-DEFAULT">
-                      {surah.number}.
-                    </span>
-                    <div>
-                      <p className="font-semibold text-ink-DEFAULT group-hover:text-emerald-DEFAULT">
-                        {surah.name}
-                      </p>
-                      <p className="text-sm font-arabic text-ink-muted">
-                        {surah.arabicName}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-4">
-                    <div className="text-right">
-                      <p className="text-sm text-ink-fant">{surah.ayatCount} ayats</p>
-                      {surah.isStarted && (
-                        <p className="text-xs text-emerald-DEFAULT">
-                          {surah.memorizedCount}/{surah.ayatCount} memorized
+                      <span className="text-lg font-bold text-emerald-DEFAULT">
+                        {surah.number}.
+                      </span>
+                      <div>
+                        <p className="font-semibold text-ink-DEFAULT group-hover:text-emerald-DEFAULT">
+                          {surah.name}
                         </p>
-                      )}
+                        <p className="text-sm font-arabic text-ink-muted">
+                          {surah.arabicName}
+                        </p>
+                      </div>
                     </div>
-                    <button 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onSurahSelect(surah.number, surah.name);
-                      }}
-                      className="text-xs px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg font-medium hover:from-emerald-600 hover:to-emerald-700 transition-all"
-                    >
-                      {surah.isStarted ? 'Continue' : 'Start'}
-                    </button>
+                    <BookOpen className="w-4 h-4 text-ink-fant group-hover:text-emerald-DEFAULT" />
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs text-ink-fant mb-3">
+                    <span>{surah.ayatCount} ayats</span>
+                    <span>
+                      {surah.hasBismillah ? "With Bismillah" : "No Bismillah"}
+                    </span>
+                  </div>
+
+                  {/* Progress Bar */}
+                  {surah.isStarted && (
+                    <div className="mb-3">
+                      <div className="flex items-center justify-between text-xs text-ink-muted mb-1">
+                        <span>
+                          {surah.memorizedCount}/{surah.ayatCount} memorized
+                        </span>
+                        <span>{surah.completionRate}%</span>
+                      </div>
+                      <div className="bg-parchment-200 rounded-full h-2">
+                        <div
+                          className={`h-2 rounded-full transition-all duration-500 ${
+                            surah.isCompleted
+                              ? "bg-gradient-to-r from-purple-400 to-purple-600"
+                              : "bg-gradient-to-r from-emerald-400 to-emerald-600"
+                          }`}
+                          style={{ width: `${surah.completionRate}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="pt-3 border-t border-parchment-200">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        {surah.isCompleted ? (
+                          <>
+                            <CheckCircle className="w-4 h-4 text-purple-DEFAULT" />
+                            <span className="text-xs text-purple-DEFAULT font-medium">
+                              Completed
+                            </span>
+                          </>
+                        ) : surah.isStarted ? (
+                          <>
+                            <Clock className="w-4 h-4 text-emerald-DEFAULT" />
+                            <span className="text-xs text-emerald-DEFAULT font-medium">
+                              In Progress
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <CheckCircle className="w-4 h-4 text-ink-fant" />
+                            <span className="text-xs text-ink-fant">
+                              Not Started
+                            </span>
+                          </>
+                        )}
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSurahSelect(surah.number, surah.name);
+                        }}
+                        className="text-xs px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg font-medium hover:from-emerald-600 hover:to-emerald-700 transition-all"
+                      >
+                        {surah.isStarted ? "Continue" : "Start"}
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-2 h-full overflow-y-auto pr-2">
+              {filteredAndSortedSurahs.map((surah, index) => (
+                <div
+                  key={surah.number}
+                  onClick={() => onSurahSelect(surah.number, surah.name)}
+                  className="group p-4 bg-white rounded-xl border border-parchment-200 hover:border-emerald-DEFAULT hover:bg-parchment-50 transition-all cursor-pointer hover-lift"
+                  style={{ animationDelay: `${index * 30}ms` }}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <span className="text-lg font-bold text-emerald-DEFAULT">
+                        {surah.number}.
+                      </span>
+                      <div>
+                        <p className="font-semibold text-ink-DEFAULT group-hover:text-emerald-DEFAULT">
+                          {surah.name}
+                        </p>
+                        <p className="text-sm font-arabic text-ink-muted">
+                          {surah.arabicName}
+                        </p>
+                      </div>
+                    </div>
 
-        {filteredAndSortedSurahs.length === 0 && (
-          <div className="text-center py-12">
-            <BookOpen className="w-16 h-16 mx-auto mb-4 text-ink-fant" />
-            <p className="text-ink-fant text-lg">No surahs found</p>
-            <p className="text-ink-muted text-sm mt-2">Try adjusting your search or filters</p>
-          </div>
-        )}
+                    <div className="flex items-center gap-4">
+                      <div className="text-right">
+                        <p className="text-sm text-ink-fant">
+                          {surah.ayatCount} ayats
+                        </p>
+                        {surah.isStarted && (
+                          <p className="text-xs text-emerald-DEFAULT">
+                            {surah.memorizedCount}/{surah.ayatCount} memorized
+                          </p>
+                        )}
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSurahSelect(surah.number, surah.name);
+                        }}
+                        className="text-xs px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg font-medium hover:from-emerald-600 hover:to-emerald-700 transition-all"
+                      >
+                        {surah.isStarted ? "Continue" : "Start"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {filteredAndSortedSurahs.length === 0 && (
+            <div className="text-center py-12">
+              <BookOpen className="w-16 h-16 mx-auto mb-4 text-ink-fant" />
+              <p className="text-ink-fant text-lg">No surahs found</p>
+              <p className="text-ink-muted text-sm mt-2">
+                Try adjusting your search or filters
+              </p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

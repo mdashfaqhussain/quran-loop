@@ -54,10 +54,17 @@
     color: #14532d;
   }
 
-  /* Focus styles */
+  /* Focus styles - user-friendly and visible */
   :focus-visible {
     outline: 2px solid #22c55e;
     outline-offset: 2px;
+  }
+
+  /* Reduce tap highlight on mobile for cleaner feel */
+  button,
+  a,
+  [role="button"] {
+    -webkit-tap-highlight-color: rgba(34, 197, 94, 0.15);
   }
 }
 
@@ -82,15 +89,66 @@
 
   /* Button variants */
   .btn-primary {
-    @apply bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-xl transition-all duration-200 shadow-soft hover:shadow-medium active:scale-95;
+    @apply bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-semibold px-6 py-3 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl active:scale-95 border border-emerald-400/30 relative overflow-hidden;
+  }
+
+  .btn-primary::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent
+    );
+    transition: left 0.5s;
+  }
+
+  .btn-primary:hover::before {
+    left: 100%;
   }
 
   .btn-secondary {
-    @apply bg-secondary-100 hover:bg-secondary-200 text-secondary-700 font-medium px-6 py-3 rounded-xl transition-all duration-200 border border-secondary-200 hover:border-secondary-300 active:scale-95;
+    @apply bg-white hover:bg-gray-50 text-gray-700 font-medium px-6 py-3 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg border border-gray-200 hover:border-gray-300 active:scale-95 relative;
   }
 
   .btn-ghost {
-    @apply bg-transparent hover:bg-neutral-100 text-neutral-600 hover:text-neutral-800 font-medium px-4 py-2 rounded-lg transition-all duration-200 active:scale-95;
+    @apply bg-transparent hover:bg-gray-100 text-gray-600 hover:text-gray-800 font-medium px-4 py-2 rounded-lg transition-all duration-200 active:scale-95;
+  }
+
+  .btn-icon {
+    @apply p-3 rounded-xl transition-all duration-200 hover:shadow-lg active:scale-95 flex items-center justify-center relative;
+  }
+
+  .btn-icon-primary {
+    @apply bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl border border-emerald-400/30;
+  }
+
+  .btn-icon-secondary {
+    @apply bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 hover:border-gray-400 shadow-md hover:shadow-lg;
+  }
+
+  .btn-danger {
+    @apply bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold px-4 py-2 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl active:scale-95 border border-red-400/30;
+  }
+
+  .btn-sm {
+    @apply px-4 py-2 text-sm rounded-lg;
+  }
+
+  .btn-lg {
+    @apply px-8 py-4 text-lg rounded-2xl;
+  }
+
+  /* Button focus states */
+  .btn-primary:focus,
+  .btn-secondary:focus,
+  .btn-icon:focus {
+    @apply outline-none ring-2 ring-emerald-500/50 ring-offset-2;
   }
 
   /* Input styles */
@@ -281,5 +339,25 @@
 
   .transition-transform {
     transition: transform 200ms ease-in-out;
+  }
+
+  /* User-friendly interactive surfaces */
+  .interactive-card {
+    @apply transition-all duration-300 ease-smooth;
+  }
+  .interactive-card:hover {
+    @apply shadow-elevated -translate-y-0.5;
+  }
+  .interactive-card:active {
+    @apply translate-y-0;
+  }
+
+  .btn-touch {
+    @apply active:scale-[0.98] transition-transform duration-150;
+  }
+
+  /* Softer focus for form controls */
+  .focus-ring-soft:focus-visible {
+    @apply outline-none ring-2 ring-primary-500/30 ring-offset-2 ring-offset-white;
   }
 }

@@ -134,6 +134,18 @@ const config: Config = {
           "0 10px 40px -10px rgba(0, 0, 0, 0.15), 0 4px 25px -5px rgba(0, 0, 0, 0.1)",
         glow: "0 0 20px rgba(34, 197, 94, 0.3)",
         "glow-lg": "0 0 40px rgba(34, 197, 94, 0.4)",
+        card: "0 1px 3px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.06)",
+        elevated: "0 4px 6px -1px rgba(0,0,0,0.05), 0 10px 24px -4px rgba(0,0,0,0.08)",
+        "elevated-hover": "0 8px 16px -4px rgba(0,0,0,0.08), 0 20px 40px -8px rgba(0,0,0,0.1)",
+        inner: "inset 0 1px 2px rgba(0,0,0,0.04)",
+      },
+      transitionDuration: {
+        "250": "250ms",
+        "400": "400ms",
+      },
+      transitionTimingFunction: {
+        smooth: "cubic-bezier(0.4, 0, 0.2, 1)",
+        spring: "cubic-bezier(0.34, 1.56, 0.64, 1)",
       },
       animation: {
         "pulse-dot": "pulseDot 1.4s ease-in-out infinite",
@@ -142,6 +154,7 @@ const config: Config = {
         "slide-in": "slideIn 0.3s ease-out",
         "bounce-soft": "bounceSoft 0.6s ease-out",
         "scale-in": "scaleIn 0.2s ease-out",
+        "success-pop": "success-pop 0.4s ease-out",
         shimmer: "shimmer 2s infinite",
         float: "float 3s ease-in-out infinite",
       },
@@ -167,6 +180,11 @@ const config: Config = {
         scaleIn: {
           from: { transform: "scale(0.9)", opacity: "0" },
           to: { transform: "scale(1)", opacity: "1" },
+        },
+        "success-pop": {
+          "0%": { transform: "scale(1)" },
+          "50%": { transform: "scale(1.08)" },
+          "100%": { transform: "scale(1)" },
         },
         shimmer: {
           "0%": { backgroundPosition: "-200% 0" },

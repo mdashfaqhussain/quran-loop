@@ -1,7 +1,18 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { CheckCircle2, Circle, Clock, Trophy, Target, TrendingUp, Calendar, Filter, Search, Star } from "lucide-react";
+import {
+  CheckCircle2,
+  Circle,
+  Clock,
+  Trophy,
+  Target,
+  TrendingUp,
+  Calendar,
+  Filter,
+  Search,
+  Star,
+} from "lucide-react";
 
 interface MemorizedItem {
   surahName: string;
@@ -9,7 +20,7 @@ interface MemorizedItem {
   surahNum: number;
   memorizedAt: Date;
   reviewCount: number;
-  difficulty?: 'easy' | 'medium' | 'hard';
+  difficulty?: "easy" | "medium" | "hard";
   lastReviewed?: Date;
 }
 
@@ -18,17 +29,21 @@ interface EnhancedProgressDashboardProps {
   totalAyats: number;
   currentStreak: number;
   longestStreak: number;
+  onReviewAyat?: (surahNum: number, ayatNum: number, surahName: string) => void;
 }
 
-export default function EnhancedProgressDashboard({ 
-  memorized, 
-  totalAyats, 
-  currentStreak, 
-  longestStreak 
+export default function EnhancedProgressDashboard({
+  memorized,
+  totalAyats,
+  currentStreak,
+  longestStreak,
+  onReviewAyat,
 }: EnhancedProgressDashboardProps) {
-  const [filter, setFilter] = useState<'all' | 'today' | 'week' | 'month'>('all');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState<'date' | 'name' | 'reviews'>('date');
+  const [filter, setFilter] = useState<"all" | "today" | "week" | "month">(
+    "all",
+  );
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState<"date" | "name" | "reviews">("date");
   const [selectedItem, setSelectedItem] = useState<MemorizedItem | null>(null);
 
   // Calculate dynamic stats
@@ -38,15 +53,23 @@ export default function EnhancedProgressDashboard({
     const thisWeek = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
     const thisMonth = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-    const todayMemorized = memorized.filter(item => new Date(item.memorizedAt) >= today);
-    const weekMemorized = memorized.filter(item => new Date(item.memorizedAt) >= thisWeek);
-    const monthMemorized = memorized.filter(item => new Date(item.memorizedAt) >= thisMonth);
+    const todayMemorized = memorized.filter(
+      (item) => new Date(item.memorizedAt) >= today,
+    );
+    const weekMemorized = memorized.filter(
+      (item) => new Date(item.memorizedAt) >= thisWeek,
+    );
+    const monthMemorized = memorized.filter(
+      (item) => new Date(item.memorizedAt) >= thisMonth,
+    );
 
-    const averageReviews = memorized.length > 0 
-      ? memorized.reduce((sum, item) => sum + item.reviewCount, 0) / memorized.length 
-      : 0;
+    const averageReviews =
+      memorized.length > 0
+        ? memorized.reduce((sum, item) => sum + item.reviewCount, 0) /
+          memorized.length
+        : 0;
 
-    const uniqueSurahs = new Set(memorized.map(item => item.surahNum)).size;
+    const uniqueSurahs = new Set(memorized.map((item) => item.surahNum)).size;
 
     return {
       todayCount: todayMemorized.length,
@@ -54,24 +77,29 @@ export default function EnhancedProgressDashboard({
       monthCount: monthMemorized.length,
       averageReviews: Math.round(averageReviews * 10) / 10,
       uniqueSurahs,
-      completionRate: Math.round((memorized.length / totalAyats) * 100)
+      completionRate: Math.round((memorized.length / totalAyats) * 100),
     };
   }, [memorized, totalAyats]);
 
   // Filter and sort items
   const filteredItems = useMemo(() => {
-    let filtered = memorized.filter(item => {
-      const matchesSearch = searchTerm === '' || 
+    let filtered = memorized.filter((item) => {
+      const matchesSearch =
+        searchTerm === "" ||
         item.surahName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.ayatNum.toString().includes(searchTerm);
 
       const now = new Date();
       const itemDate = new Date(item.memorizedAt);
-      
-      const matchesFilter = filter === 'all' ||
-        (filter === 'today' && itemDate.toDateString() === now.toDateString()) ||
-        (filter === 'week' && itemDate >= new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)) ||
-        (filter === 'month' && itemDate >= new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000));
+
+      const matchesFilter =
+        filter === "all" ||
+        (filter === "today" &&
+          itemDate.toDateString() === now.toDateString()) ||
+        (filter === "week" &&
+          itemDate >= new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)) ||
+        (filter === "month" &&
+          itemDate >= new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000));
 
       return matchesSearch && matchesFilter;
     });
@@ -79,11 +107,14 @@ export default function EnhancedProgressDashboard({
     // Sort items
     return filtered.sort((a, b) => {
       switch (sortBy) {
-        case 'date':
-          return new Date(b.memorizedAt).getTime() - new Date(a.memorizedAt).getTime();
-        case 'name':
+        case "date":
+          return (
+            new Date(b.memorizedAt).getTime() -
+            new Date(a.memorizedAt).getTime()
+          );
+        case "name":
           return a.surahName.localeCompare(b.surahName);
-        case 'reviews':
+        case "reviews":
           return b.reviewCount - a.reviewCount;
         default:
           return 0;
@@ -106,10 +137,12 @@ export default function EnhancedProgressDashboard({
             </div>
           </div>
           <div>
-            <p className="text-3xl font-bold text-ink-DEFAULT">{memorized.length}</p>
+            <p className="text-3xl font-bold text-ink-DEFAULT">
+              {memorized.length}
+            </p>
             <p className="text-sm text-ink-fant">Total Memorized</p>
             <div className="mt-2 bg-parchment-200 rounded-full h-2">
-              <div 
+              <div
                 className="bg-gradient-to-r from-emerald-400 to-emerald-600 h-2 rounded-full transition-all duration-500"
                 style={{ width: `${stats.completionRate}%` }}
               />
@@ -128,9 +161,13 @@ export default function EnhancedProgressDashboard({
             </div>
           </div>
           <div>
-            <p className="text-3xl font-bold text-ink-DEFAULT">{stats.completionRate}%</p>
+            <p className="text-3xl font-bold text-ink-DEFAULT">
+              {stats.completionRate}%
+            </p>
             <p className="text-sm text-ink-fant">Completion Rate</p>
-            <p className="text-xs text-ink-muted mt-1">{stats.uniqueSurahs} unique surahs</p>
+            <p className="text-xs text-ink-muted mt-1">
+              {stats.uniqueSurahs} unique surahs
+            </p>
           </div>
         </div>
 
@@ -145,9 +182,13 @@ export default function EnhancedProgressDashboard({
             </div>
           </div>
           <div>
-            <p className="text-3xl font-bold text-ink-DEFAULT">{currentStreak}</p>
+            <p className="text-3xl font-bold text-ink-DEFAULT">
+              {currentStreak}
+            </p>
             <p className="text-sm text-ink-fant">Current Streak</p>
-            <p className="text-xs text-ink-muted mt-1">Best: {longestStreak} days</p>
+            <p className="text-xs text-ink-muted mt-1">
+              Best: {longestStreak} days
+            </p>
           </div>
         </div>
 
@@ -158,11 +199,15 @@ export default function EnhancedProgressDashboard({
             </div>
             <div className="flex items-center gap-1 text-purple-600">
               <TrendingUp className="w-4 h-4" />
-              <span className="text-sm font-medium">{stats.averageReviews}x</span>
+              <span className="text-sm font-medium">
+                {stats.averageReviews}x
+              </span>
             </div>
           </div>
           <div>
-            <p className="text-3xl font-bold text-ink-DEFAULT">{stats.averageReviews}</p>
+            <p className="text-3xl font-bold text-ink-DEFAULT">
+              {stats.averageReviews}
+            </p>
             <p className="text-sm text-ink-fant">Avg Reviews</p>
             <p className="text-xs text-ink-muted mt-1">Per ayat</p>
           </div>
@@ -187,19 +232,20 @@ export default function EnhancedProgressDashboard({
           {/* Filter Tabs */}
           <div className="flex gap-2">
             {[
-              { key: 'all', label: 'All Time', count: memorized.length },
-              { key: 'today', label: 'Today', count: stats.todayCount },
-              { key: 'week', label: 'This Week', count: stats.weekCount },
-              { key: 'month', label: 'This Month', count: stats.monthCount }
-            ].map(tab => (
+              { key: "all", label: "All Time", count: memorized.length },
+              { key: "today", label: "Today", count: stats.todayCount },
+              { key: "week", label: "This Week", count: stats.weekCount },
+              { key: "month", label: "This Month", count: stats.monthCount },
+            ].map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => setFilter(tab.key as any)}
                 className={`
                   px-4 py-3 rounded-xl text-sm font-medium transition-all hover-lift
-                  ${filter === tab.key
-                    ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg'
-                    : 'bg-parchment-100 text-ink-muted hover:bg-parchment-200'
+                  ${
+                    filter === tab.key
+                      ? "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-lg"
+                      : "bg-parchment-100 text-ink-muted hover:bg-parchment-200"
                   }
                 `}
               >
@@ -229,7 +275,9 @@ export default function EnhancedProgressDashboard({
             <div className="text-center py-12">
               <Circle className="w-16 h-16 mx-auto mb-4 text-ink-fant" />
               <p className="text-ink-fant text-lg">No memorized ayats found</p>
-              <p className="text-ink-muted text-sm mt-2">Try adjusting your search or filters</p>
+              <p className="text-ink-muted text-sm mt-2">
+                Try adjusting your search or filters
+              </p>
             </div>
           ) : (
             filteredItems.map((item, index) => (
@@ -238,12 +286,13 @@ export default function EnhancedProgressDashboard({
                 onClick={() => setSelectedItem(item)}
                 className={`
                   p-4 rounded-xl border transition-all cursor-pointer hover-lift
-                  ${selectedItem === item 
-                    ? 'bg-gradient-to-r from-emerald-50 to-emerald-100 border-emerald-300 shadow-lg' 
-                    : 'bg-white border-parchment-200 hover:border-emerald-200 hover:shadow-md'
+                  ${
+                    selectedItem === item
+                      ? "bg-gradient-to-r from-emerald-50 to-emerald-100 border-emerald-300 shadow-lg"
+                      : "bg-white border-parchment-200 hover:border-emerald-200 hover:shadow-md"
                   }
                 `}
-                style={{ animationDelay: `${index * 50}ms` }}
+                style={{ animationDelay: `${index * 30}ms` }}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
@@ -254,21 +303,38 @@ export default function EnhancedProgressDashboard({
                           {item.surahName} - Ayat {item.ayatNum}
                         </p>
                         <div className="flex items-center gap-4 text-xs text-ink-fant mt-1">
-                          <span>Memorized {new Date(item.memorizedAt).toLocaleDateString()}</span>
+                          <span>
+                            Memorized{" "}
+                            {new Date(item.memorizedAt).toLocaleDateString()}
+                          </span>
                           <span>•</span>
                           <span>Reviewed {item.reviewCount} times</span>
                         </div>
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center gap-3">
                     <div className="text-right">
                       <div className="flex items-center gap-1 text-xs text-ink-muted">
                         <Clock className="w-3 h-3" />
-                        <span>{new Date(item.memorizedAt).toLocaleDateString()}</span>
+                        <span>
+                          {new Date(item.memorizedAt).toLocaleDateString()}
+                        </span>
                       </div>
-                      <button className="mt-1 px-3 py-1 bg-emerald-DEFAULT text-white rounded-lg text-xs font-medium hover:bg-emerald-700 transition-all">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (onReviewAyat) {
+                            onReviewAyat(
+                              item.surahNum,
+                              item.ayatNum,
+                              item.surahName,
+                            );
+                          }
+                        }}
+                        className="mt-1 px-3 py-1 bg-emerald-DEFAULT text-white rounded-lg text-xs font-medium hover:bg-emerald-700 transition-all"
+                      >
                         Review Now
                       </button>
                     </div>
