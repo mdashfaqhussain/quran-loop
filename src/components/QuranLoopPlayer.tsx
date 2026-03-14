@@ -18,7 +18,19 @@ interface MemorizedItem {
   surahNum: number;
 }
 
-export default function QuranLoopPlayer() {
+interface QuranLoopPlayerProps {
+  onMarkMemorized?: (
+    surahName: string,
+    ayatNum: number,
+    surahNum: number,
+  ) => void;
+  selectedSurahFromLibrary?: { number: number; name: string } | null;
+}
+
+export default function QuranLoopPlayer({
+  onMarkMemorized,
+  selectedSurahFromLibrary,
+}: QuranLoopPlayerProps = {}) {
   const [selectedSurah, setSelectedSurah] = useState<number>(112);
   const [ayatInput, setAyatInput] = useState<number>(1);
   const [ayatError, setAyatError] = useState<string>("");
@@ -69,6 +81,21 @@ export default function QuranLoopPlayer() {
     else if (playState === "error")
       setStatusMsg("Audio failed to load — check internet connection");
   }, [playState, loadedAyat]);
+
+  // Handle surah selection from library
+  useEffect(() => {
+    if (
+      selectedSurahFromLibrary &&
+      selectedSurahFromLibrary.number !== selectedSurah
+    ) {
+      setSelectedSurah(selectedSurahFromLibrary.number);
+      setAyatInput(1);
+      setAyatError("");
+      setLoadedAyat(null);
+      stop();
+      setAllDoneBanner(false);
+    }
+  }, [selectedSurahFromLibrary, selectedSurah, stop]);
 
   const currentSurah = SURAHS.find((s) => s.number === selectedSurah)!;
 
@@ -161,6 +188,14 @@ export default function QuranLoopPlayer() {
 
   function handleMarkMemorized() {
     if (!loadedAyat) return;
+    // Call the parent's memorization handler
+    if (onMarkMemorized) {
+      onMarkMemorized(
+        loadedAyat.surahName,
+        loadedAyat.ayatNumber,
+        loadedAyat.surahNumber,
+      );
+    }
     setMemorized((prev) => [
       ...prev,
       {

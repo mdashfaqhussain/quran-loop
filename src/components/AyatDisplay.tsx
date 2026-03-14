@@ -1,6 +1,6 @@
 import { AyatData } from "@/lib/api";
 import { getBismillahInfo } from "@/lib/surahs";
-import BismillahBanner from "./BismillahBanner";
+import BismillahBanner from "@/components/BismillahBanner";
 
 interface AyatDisplayProps {
   loadedAyat: AyatData | null;
@@ -29,9 +29,9 @@ export default function AyatDisplay({
     <>
       {/* Bismillah Banner */}
       {bismillahInfo?.showBanner && (
-        <BismillahBanner 
-          onPlay={onPlayBismillah} 
-          isPlaying={isBismillahPlaying} 
+        <BismillahBanner
+          onPlay={onPlayBismillah}
+          isPlaying={isBismillahPlaying}
         />
       )}
 
@@ -70,8 +70,9 @@ export default function AyatDisplay({
       {/* Bismillah note for non-Fatihah surahs */}
       {bismillahInfo?.showBanner && (
         <div className="mb-4 px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-700 leading-relaxed">
-          <strong>Note:</strong> Bismillah is recited aloud before this ayat but is not a numbered ayat of this surah.
-          The audio begins directly from Ayat 1. Use the Play Bismillah button above to hear it first.
+          <strong>Note:</strong> Bismillah is recited aloud before this ayat but
+          is not a numbered ayat of this surah. The audio begins directly from
+          Ayat 1. Use the Play Bismillah button above to hear it first.
         </div>
       )}
     </>
