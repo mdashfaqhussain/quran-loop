@@ -59,6 +59,7 @@ interface AdvancedProgressDashboardProps {
   currentStreak: number;
   longestStreak: number;
   onReviewAyat?: (surahNum: number, ayatNum: number, surahName: string) => void;
+  onRefreshStreak?: () => void;
 }
 
 export default function AdvancedProgressDashboard({
@@ -67,6 +68,7 @@ export default function AdvancedProgressDashboard({
   currentStreak,
   longestStreak,
   onReviewAyat,
+  onRefreshStreak,
 }: AdvancedProgressDashboardProps) {
   const [filter, setFilter] = useState<
     "all" | "today" | "week" | "month" | "due" | "overdue"
@@ -455,9 +457,20 @@ export default function AdvancedProgressDashboard({
                 </div>
               </div>
               <div>
-                <p className="text-3xl font-bold text-neutral-900">
-                  {currentStreak}
-                </p>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-3xl font-bold text-neutral-900">
+                    {currentStreak}
+                  </p>
+                  {onRefreshStreak && (
+                    <button
+                      onClick={onRefreshStreak}
+                      className="p-1 rounded-lg hover:bg-neutral-100 transition-colors"
+                      title="Refresh streak data"
+                    >
+                      <RefreshCw className="w-4 h-4 text-neutral-500" />
+                    </button>
+                  )}
+                </div>
                 <p className="text-sm text-neutral-500">Current Streak</p>
                 <p className="text-xs text-neutral-400 mt-1">
                   Best: {longestStreak} days
