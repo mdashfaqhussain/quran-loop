@@ -1,24 +1,27 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
-import ModernAppLayout from "@/components/ModernAppLayout";
-import ModernQuranPlayer from "@/components/ModernQuranPlayer";
-import AdvancedProgressDashboard from "@/components/AdvancedProgressDashboard";
-import EnhancedSurahLibrary from "@/components/EnhancedSurahLibrary";
-import Settings from "@/components/Settings";
 import { useAuth } from "@/contexts/AuthContext";
-import { useUserData, type MemorizedItem } from "@/hooks/useUserData";
+import { useUserData } from "@/hooks/useUserData";
+import { ModernAppLayout } from "@/components/ModernAppLayout";
+import { AyatDisplay } from "@/components/AyatDisplay";
+import { ProgressDashboard } from "@/components/ProgressDashboard";
+import { AdvancedProgressDashboard } from "@/components/AdvancedProgressDashboard";
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { MemorizedItem } from "@/types/quran";
+import { useActivityTracker } from "@/lib/activityTracker";
+import { ActivityTracker } from "@/lib/activityTracker";
 import { DEFAULT_SETTINGS } from "@/lib/userData";
 import AuthWrapper from "@/components/AuthWrapper";
 
 function AppContent() {
   const { user } = useAuth();
+  const activityTracker = useActivityTracker();
   const {
     memorized: cloudMemorized,
     settings: cloudSettings,
     setMemorized: setCloudMemorized,
     setSettings: setCloudSettings,
-    loading: userDataLoading,
+    loading,
   } = useUserData(user?.uid ?? null);
 
   const [activeSection, setActiveSection] = useState("player");
@@ -28,6 +31,13 @@ function AppContent() {
     number: number;
     name: string;
   } | null>(null);
+
+  // Track user login/activity
+  useEffect(() => {
+    if (user && !loading) {
+      activityTracker.trackLogin();
+    }
+  }, [user, loading, activityTracker]);
 
   const isSignedIn = Boolean(user);
   const memorizedData = isSignedIn ? cloudMemorized : localMemorized;
@@ -130,24 +140,21 @@ function AppContent() {
   }
 
   const handleMarkMemorized = useCallback(
-    (surahName: string, ayatNum: number, surahNum: number) => {
+    (ayahNumber: number, surahNumber: number) => {
+      // Track memorization activity
+      activityTracker.trackMarkMemorized(ayahNumber, surahNumber);
+      
       setMemorizedData((prev) => {
         const existing = prev.find(
-          (item) => item.surahNum === surahNum && item.ayatNum === ayatNum,
+          (item) => item.ayahNumber === ayahNumber && item.surahNumber === surahNumber
         );
         if (existing) {
-          return prev.map((item) =>
-            item.surahNum === surahNum && item.ayatNum === ayatNum
-              ? {
-                  ...item,
-                  reviewCount: item.reviewCount + 1,
-                  memorizedAt: new Date(),
-                  lastReviewed: new Date(),
-                }
-              : item,
+          return prev.filter(
+            (item) => !(item.ayahNumber === ayahNumber && item.surahNumber === surahNumber)
           );
+        } else {
+          return [...prev, { ayahNumber, surahNumber, memorizedAt: new Date() }];
         }
-        return [
           ...prev,
           {
             surahName,
@@ -240,6 +247,11 @@ function AppContent() {
       isSignedIn={isSignedIn}
       userDataLoading={userDataLoading}
     >
+      {useEffect(() => {
+        if (user && !userDataLoading) {
+          activityTracker.trackLogin();
+        }
+      }, [user, userDataLoading, activityTracker]);}
       {renderContent()}
     </ModernAppLayout>
   );
