@@ -143,32 +143,29 @@ function AppContent() {
     (ayahNumber: number, surahNumber: number) => {
       // Track memorization activity
       activityTracker.trackMarkMemorized(ayahNumber, surahNumber);
-      
+
       setMemorizedData((prev) => {
         const existing = prev.find(
-          (item) => item.ayahNumber === ayahNumber && item.surahNumber === surahNumber
+          (item) =>
+            item.ayahNumber === ayahNumber && item.surahNumber === surahNumber,
         );
         if (existing) {
           return prev.filter(
-            (item) => !(item.ayahNumber === ayahNumber && item.surahNumber === surahNumber)
+            (item) =>
+              !(
+                item.ayahNumber === ayahNumber &&
+                item.surahNumber === surahNumber
+              ),
           );
         } else {
-          return [...prev, { ayahNumber, surahNumber, memorizedAt: new Date() }];
+          return [
+            ...prev,
+            { ayahNumber, surahNumber, memorizedAt: new Date() },
+          ];
         }
-          ...prev,
-          {
-            surahName,
-            ayatNum,
-            surahNum,
-            memorizedAt: new Date(),
-            lastReviewed: new Date(),
-            reviewCount: 1,
-            difficulty: "medium" as const,
-          },
-        ];
       });
     },
-    [setMemorizedData],
+    [setMemorizedData, activityTracker],
   );
 
   const handleSurahSelect = (surahNum: number, surahName: string) => {
@@ -245,13 +242,8 @@ function AppContent() {
       activeSection={activeSection}
       onSectionChange={setActiveSection}
       isSignedIn={isSignedIn}
-      userDataLoading={userDataLoading}
+      userDataLoading={loading}
     >
-      {useEffect(() => {
-        if (user && !userDataLoading) {
-          activityTracker.trackLogin();
-        }
-      }, [user, userDataLoading, activityTracker]);}
       {renderContent()}
     </ModernAppLayout>
   );
